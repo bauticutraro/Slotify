@@ -2,10 +2,10 @@ import Axios from 'axios';
 import authorize from './authorize';
 
 Axios.interceptors.response.use(
-  function(config) {
+  function (config) {
     return config;
   },
-  async function(error) {
+  async function (error) {
     const status = error.response.data.error.status;
 
     if (status === 401) authorize();
@@ -14,15 +14,24 @@ Axios.interceptors.response.use(
   }
 );
 
+export const defaultHeaders = header => {
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.token}`,
+    ...header,
+  };
+
+  if (!localStorage.token) delete headers.Authorization;
+
+  return headers;
+};
+
 export default async (url, method = 'GET', headers = {}, data = {}) => {
   const res = await Axios({
-    url,
+    url: `https://api.spotify.com/v1${url}`,
     method,
     data,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-      ...headers
-    }
+    headers: defaultHeaders(headers),
   });
   return res.data;
 };

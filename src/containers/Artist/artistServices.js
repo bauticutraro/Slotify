@@ -1,26 +1,16 @@
 import api from '../../utils/api';
 
-export const getArtist = artistId =>
-  api(`https://api.spotify.com/v1/artists/${artistId}`);
+export const getArtist = artistId => api(`/artists/${artistId}`);
 
-export const getArtistTracks = artistId =>
-  api(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?country=ES`);
+export const getArtistTracks = artistId => api(`/artists/${artistId}/top-tracks?country=ES`);
 
 export const getArtistAlbums = artistId =>
-  api(
-    `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=single%2Cappears_on&market=ES&limit=50`
-  );
+  api(`/artists/${artistId}/albums?include_groups=single%2Cappears_on&market=ES&limit=50`);
 
-export const getArtistsRelated = artistId =>
-  api(`https://api.spotify.com/v1/artists/${artistId}/related-artists`);
+export const getArtistsRelated = artistId => api(`/artists/${artistId}/related-artists`);
 
 export const isUserFollowing = artistId =>
-  api(
-    `https://api.spotify.com/v1/me/following/contains?type=artist&ids=${artistId}`
-  );
+  api(`/me/following/contains?type=artist&ids=${artistId}`);
 
 export const followUnfollow = (artistId, action = 'follow') =>
-  api(
-    `https://api.spotify.com/v1/me/following?type=artist&ids=${artistId}`,
-    action === 'follow' ? 'PUT' : 'DELETE'
-  );
+  api(`/me/following?type=artist&ids=${artistId}`, action === 'follow' ? 'PUT' : 'DELETE');
