@@ -39,25 +39,22 @@ import {
 } from '../../components/LibraryItem/playlistItemStyles';
 import MoreMenu from '../../components/MoreMenu/MoreMenu';
 import { checkLikeSongStart } from '../Playlists/playlistsActions';
+import { pauseSong, setList, startSong } from '../Track/trackActions';
 
 const Artist = () => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [moreMenuPosition, setMoreMenuPosition] = useState([0, 0]);
 
   const dispatch = useDispatch();
-  const { likedSongs, loading: playlistLoading } = useSelector(
-    ({ playlists }) => playlists
-  );
-  const { artist, tracks, following, loading } = useSelector(
-    ({ artist }) => artist
-  );
-  const { albums, singles, appears } = useSelector(
-    ({ artist: { albums } }) => ({
-      albums: albums.filter(({ album_type }) => album_type === 'album'),
-      singles: albums.filter(({ album_type }) => album_type === 'single'),
-      appears: albums.filter(({ album_type }) => album_type === 'compilation'),
-    })
-  );
+  const { likedSongs, loading: playlistLoading } = useSelector(({ playlists }) => playlists);
+  const { artist, tracks, following, loading } = useSelector(({ artist }) => artist);
+  const { albums, singles, appears } = useSelector(({ artist: { albums } }) => ({
+    albums: albums.filter(({ album_type }) => album_type === 'album'),
+    singles: albums.filter(({ album_type }) => album_type === 'single'),
+    appears: albums.filter(({ album_type }) => album_type === 'compilation'),
+  }));
+
+  const isPlaying = useSelector(({ track }) => track.isPlaying);
 
   useTitle(`Spotify - ${artist.name}`);
 
@@ -73,14 +70,28 @@ const Artist = () => {
   }, [dispatch, id]);
 
   const handleFollow = () => {
-    dispatch(
-      followArtistStart({ id, action: following ? 'unfollow' : 'follow' })
-    );
+    dispatch(followArtistStart({ id, action: following ? 'unfollow' : 'follow' }));
   };
 
   const handleOnClickMore = e => {
     setIsMoreMenuOpen(true);
     setMoreMenuPosition([e.pageX, e.pageY]);
+  };
+
+  const handleStartPlay = () => {
+    if (isPlaying) dispatch(pauseSong());
+    else {
+      dispatch(
+        setList({
+          list: tracks.filter(track => track?.track?.preview_url),
+        })
+      );
+      dispatch(
+        startSong({
+          song: { ...tracks[0], cover: artist.images && artist.images[0].url },
+        })
+      );
+    }
   };
 
   if (loading || playlistLoading) return <Loader isLoading={loading} />;
@@ -111,25 +122,20 @@ const Artist = () => {
         ]}
       />
       <ArtistContainer style={{ color: '#fff' }}>
-        <ArtistBackground
-          color={randomColors[artist?.followers?.total?.toString()[0]]}
-        />
+        <ArtistBackground color={randomColors[artist?.followers?.total?.toString()[0]]} />
         <ArtistSubContainer>
           <ArtistHeader>
             <ArtistName>{artist.name}</ArtistName>
             <ArtistButtonsContainer>
-              <ArtistPlayButton onClick={() => alert('play')}>
-                Play
+              <ArtistPlayButton onClick={handleStartPlay}>
+                {isPlaying ? 'Pause' : 'Play'}
               </ArtistPlayButton>
               <ArtistFollowContainer onClick={handleFollow}>
                 <ArtitstFollowText color={following ? '#1db954' : '#fff'}>
                   {following ? 'UnFollow' : 'Follow'}
                 </ArtitstFollowText>
               </ArtistFollowContainer>
-              <ArtistMoreIconContainer
-                onClick={handleOnClickMore}
-                active={isMoreMenuOpen}
-              >
+              <ArtistMoreIconContainer onClick={handleOnClickMore} active={isMoreMenuOpen}>
                 <MoreIcon fill='#fff' width={24} />
               </ArtistMoreIconContainer>
             </ArtistButtonsContainer>
@@ -180,10 +186,7 @@ const Artist = () => {
                       <SectionTitleContainer hasPadding={false}>
                         <SectionTitle>Albums</SectionTitle>
                       </SectionTitleContainer>
-                      <LibraryItemsContainer
-                        hasPadding={false}
-                        itemMinWidth={220}
-                      >
+                      <LibraryItemsContainer hasPadding={false} itemMinWidth={220}>
                         <ArtistContentItem albums={albums} />
                       </LibraryItemsContainer>
                     </ArtistSection>
@@ -194,10 +197,7 @@ const Artist = () => {
                       <SectionTitleContainer hasPadding={false}>
                         <SectionTitle>Singles</SectionTitle>
                       </SectionTitleContainer>
-                      <LibraryItemsContainer
-                        hasPadding={false}
-                        itemMinWidth={220}
-                      >
+                      <LibraryItemsContainer hasPadding={false} itemMinWidth={220}>
                         <ArtistContentItem albums={singles} />
                       </LibraryItemsContainer>
                     </ArtistSection>
@@ -208,10 +208,7 @@ const Artist = () => {
                       <SectionTitleContainer hasPadding={false}>
                         <SectionTitle>Appears on</SectionTitle>
                       </SectionTitleContainer>
-                      <LibraryItemsContainer
-                        hasPadding={false}
-                        itemMinWidth={220}
-                      >
+                      <LibraryItemsContainer hasPadding={false} itemMinWidth={220}>
                         <ArtistContentItem albums={appears} />
                       </LibraryItemsContainer>
                     </ArtistSection>
