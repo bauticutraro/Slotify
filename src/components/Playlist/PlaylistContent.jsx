@@ -50,8 +50,7 @@ const PlaylistContent = ({
           name: 'Liked Songs',
           images: [
             {
-              url:
-                'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+              url: 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
             },
           ],
         },
@@ -73,7 +72,7 @@ const PlaylistContent = ({
         moreMenuPosition={moreMenuPosition}
         items={[
           {
-            title: `${inLibrary ? 'Remove' : 'Add'} from your library`,
+            title: `${following ? 'Remove' : 'Add'} from your library`,
             onClick: () => handleFollow(),
           },
           {
@@ -88,9 +87,7 @@ const PlaylistContent = ({
               {playlistData.images &&
                 (playlistData?.images[0]?.url ? (
                   <PlaylistImage
-                    src={
-                      playlistData?.images ? playlistData?.images[0]?.url : ''
-                    }
+                    src={playlistData?.images ? playlistData?.images[0]?.url : ''}
                     alt=''
                   />
                 ) : (
@@ -101,12 +98,9 @@ const PlaylistContent = ({
             {!isLikedSongs ? (
               <PlaylistOwner
                 onClick={() =>
-                  history.push(
-                    `/app/user/${playlistData?.owner.display_name}`,
-                    {
-                      id: playlistData?.owner.id,
-                    }
-                  )
+                  history.push(`/app/user/${playlistData?.owner.display_name}`, {
+                    id: playlistData?.owner.id,
+                  })
                 }
               >
                 {playlistData?.owner?.display_name}
@@ -115,10 +109,7 @@ const PlaylistContent = ({
           </PlaylistHeaderSubcontainer>
 
           <PlaylistButtonsContainer>
-            <PlaylistPlay
-              onClick={startPlaylist}
-              disabled={!playlistData?.tracks?.total}
-            >
+            <PlaylistPlay onClick={startPlaylist} disabled={!playlistData?.tracks?.total}>
               {isPlaying ? 'PAUSE' : 'PLAY'}
             </PlaylistPlay>
             {!isLikedSongs ? (
@@ -126,26 +117,13 @@ const PlaylistContent = ({
                 {!isMyPlaylist ? (
                   <IconContainer>
                     {following ? (
-                      <HeartIcon
-                        fill='#1db954'
-                        width={20}
-                        height={20}
-                        onClick={handleFollow}
-                      />
+                      <HeartIcon fill='#1db954' width={20} height={20} onClick={handleFollow} />
                     ) : (
-                      <HeartOutlineIcon
-                        fill='#fff'
-                        width={20}
-                        height={20}
-                        onClick={handleFollow}
-                      />
+                      <HeartOutlineIcon fill='#fff' width={20} height={20} onClick={handleFollow} />
                     )}
                   </IconContainer>
                 ) : null}
-                <IconContainer
-                  onClick={handleOnClickMore}
-                  active={isMoreMenuOpen}
-                >
+                <IconContainer onClick={handleOnClickMore} active={isMoreMenuOpen}>
                   <MoreIcon fill='#fff' width={20} />
                 </IconContainer>
               </PlaylistIconsWrapper>
@@ -153,13 +131,10 @@ const PlaylistContent = ({
           </PlaylistButtonsContainer>
           <PlaylistDescriptionContainer>
             {!isLikedSongs ? (
-              <PlaylistDescription>
-                {playlistData?.description}
-              </PlaylistDescription>
+              <PlaylistDescription>{playlistData?.description}</PlaylistDescription>
             ) : null}
             <PlaylistTotalSongs>
-              {playlistData?.tracks?.total ? playlistData?.tracks?.total : 0}{' '}
-              songs
+              {playlistData?.tracks?.total ? playlistData?.tracks?.total : 0} songs
             </PlaylistTotalSongs>
           </PlaylistDescriptionContainer>
         </PlaylistHeader>

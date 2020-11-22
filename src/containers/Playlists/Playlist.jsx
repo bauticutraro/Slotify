@@ -119,7 +119,6 @@ const Playlist = () => {
           startPlaylist={startPlaylist}
           isPlaying={isPlaying}
           userId={userId}
-          inLibrary={playlistsList.some(pl => pl.id === playlist.id)}
         />
       ) : (
         <PlaylistContent
