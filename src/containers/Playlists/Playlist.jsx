@@ -12,12 +12,7 @@ import {
   cleanPlaylist,
 } from './playlistsActions';
 import { PlaylistContainer } from './playlistsStyles';
-import {
-  setList,
-  startSong,
-  pauseSong,
-  cleanList,
-} from '../Track/trackActions';
+import { setList, startSong, pauseSong, cleanList } from '../Track/trackActions';
 
 import PlaylistContent from '../../components/Playlist/PlaylistContent';
 import Loader from '../../components/Loader/Loader';
@@ -28,16 +23,12 @@ import useTitle from '../../hooks/useTitle';
 const Playlist = () => {
   const dispatch = useDispatch();
 
-  const { playlist, following, loading, error } = useSelector(
-      ({ playlists }) => playlists
-    ),
+  const { playlist, following, loading, error } = useSelector(({ playlists }) => playlists),
     { id: userId } = useSelector(({ auth }) => auth.user);
 
   const isPlaying = useSelector(({ track: { isPlaying } }) => isPlaying);
 
-  const playlistsList = playlist?.tracks?.items?.filter(
-    ({ track }) => track?.preview_url
-  );
+  const playlistsList = playlist?.tracks?.items?.filter(({ track }) => track?.preview_url);
 
   const { id } = useParams(),
     { pathname } = useLocation();
@@ -61,9 +52,10 @@ const Playlist = () => {
 
   useEffect(() => {
     if (playlist?.tracks?.items.length === 0) dispatch(getRandomTracksStart());
-    dispatch(checkUserFollowPlaylistStart({ playlistId: id, userId }));
+    if (!pathname.includes('/tracks'))
+      dispatch(checkUserFollowPlaylistStart({ playlistId: id, userId }));
     dispatch(checkLikeSongStart());
-  }, [playlist, dispatch, id, userId]);
+  }, [playlist, dispatch, id, userId, pathname]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -75,8 +67,7 @@ const Playlist = () => {
         : '#a0c3d2'
     );
 
-    return () =>
-      document.documentElement.style.setProperty('--color', '#121212');
+    return () => document.documentElement.style.setProperty('--color', '#121212');
   }, [pathname, playlist]);
 
   const handleFollow = () => {
@@ -94,9 +85,7 @@ const Playlist = () => {
     else {
       dispatch(
         setList({
-          list: playlist?.tracks?.items?.filter(
-            ({ track }) => track?.preview_url
-          ),
+          list: playlist?.tracks?.items?.filter(({ track }) => track?.preview_url),
         })
       );
       dispatch(
@@ -111,6 +100,7 @@ const Playlist = () => {
       );
     }
   };
+
   if (loading || !Object.keys(playlist).length) {
     document.documentElement.style.setProperty('--color', '#121212');
     return <Loader isLoading={loading} />;
