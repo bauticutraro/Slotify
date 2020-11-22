@@ -50,6 +50,10 @@ const Album = () => {
 
   const history = useHistory();
 
+  const [isLikeTheAlbum, setIsLikeTheAlbum] = useState(
+    albums.some(({ album: { id } }) => id === album.id)
+  );
+
   useTitle(`Spotify - ${album.name}`);
 
   const randomColors = [
@@ -102,10 +106,13 @@ const Album = () => {
     setMoreMenuPosition([e.pageX, e.pageY]);
   };
 
-  const iLikeTheAlbum = React.useMemo(() => albums.some(({ album: { id } }) => id === album.id), [
-    album.id,
-    albums,
-  ]);
+  const handleOnClickHeart = () => {
+    isLikeTheAlbum
+      ? dispatch(removeAlbumStart({ id: album.id }))
+      : dispatch(saveAlbumStart({ id: album.id }));
+
+    setIsLikeTheAlbum(!isLikeTheAlbum);
+  };
 
   if (loading || albumsLoading || playlistLoading) return <Loader isLoading={loading} />;
 
@@ -117,11 +124,8 @@ const Album = () => {
         moreMenuPosition={moreMenuPosition}
         items={[
           {
-            title: `${iLikeTheAlbum ? 'Remove' : 'Save'} in the library`,
-            onClick: () =>
-              iLikeTheAlbum
-                ? dispatch(removeAlbumStart({ id: album.id }))
-                : dispatch(saveAlbumStart({ id: album.id })),
+            title: `${isLikeTheAlbum ? 'Remove' : 'Save'} in the library`,
+            onClick: handleOnClickHeart,
           },
 
           {
@@ -153,19 +157,14 @@ const Album = () => {
               <PlaylistPlay onClick={startAlbum}>{isPlaying ? 'PAUSE' : 'PLAY'}</PlaylistPlay>
               <PlaylistIconsWrapper>
                 <IconContainer>
-                  {iLikeTheAlbum ? (
-                    <HeartIcon
-                      fill='#1db954'
-                      width={20}
-                      height={20}
-                      onClick={() => dispatch(removeAlbumStart({ id: album.id }))}
-                    />
+                  {isLikeTheAlbum ? (
+                    <HeartIcon fill='#1db954' width={20} height={20} onClick={handleOnClickHeart} />
                   ) : (
                     <HeartOutlineIcon
                       fill='#fff'
                       width={20}
                       height={20}
-                      onClick={() => dispatch(saveAlbumStart({ id: album.id }))}
+                      onClick={handleOnClickHeart}
                     />
                   )}
                 </IconContainer>

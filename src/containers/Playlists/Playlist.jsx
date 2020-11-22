@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,10 +37,12 @@ const Playlist = () => {
     message: 'Oooops something went wrong.',
   });
 
-  useTitle(`Spotify - ${playlist.name}`);
+  const isLikedSongs = useMemo(() => pathname.includes('/tracks'), [pathname]);
+
+  useTitle(`Spotify - ${isLikedSongs ? 'Liked songs' : playlist.name}`);
 
   useEffect(() => {
-    if (!pathname.includes('/tracks')) {
+    if (!isLikedSongs) {
       dispatch(getPlaylistStart({ id }));
     } else dispatch(getUserTracksStart());
 
@@ -48,19 +50,18 @@ const Playlist = () => {
       dispatch(cleanPlaylist());
       dispatch(cleanList());
     };
-  }, [dispatch, id, pathname, userId]);
+  }, [isLikedSongs, dispatch, id, pathname, userId]);
 
   useEffect(() => {
     if (playlist?.tracks?.items.length === 0) dispatch(getRandomTracksStart());
-    if (!pathname.includes('/tracks'))
-      dispatch(checkUserFollowPlaylistStart({ playlistId: id, userId }));
+    if (!isLikedSongs) dispatch(checkUserFollowPlaylistStart({ playlistId: id, userId }));
     dispatch(checkLikeSongStart());
-  }, [playlist, dispatch, id, userId, pathname]);
+  }, [isLikedSongs, playlist, dispatch, id, userId, pathname]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--color',
-      pathname.includes('/tracks')
+      isLikedSongs
         ? '#5f54a0'
         : playlist?.tracks?.items?.length
         ? playlist.primary_color
@@ -68,7 +69,7 @@ const Playlist = () => {
     );
 
     return () => document.documentElement.style.setProperty('--color', '#121212');
-  }, [pathname, playlist]);
+  }, [isLikedSongs, pathname, playlist]);
 
   const handleFollow = () => {
     dispatch(
@@ -110,7 +111,7 @@ const Playlist = () => {
 
   return (
     <PlaylistContainer>
-      {!pathname.includes('/tracks') && playlist ? (
+      {!isLikedSongs && playlist ? (
         <PlaylistContent
           playlist={playlist}
           following={following}
