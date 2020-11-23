@@ -82,6 +82,7 @@ const Playlist = () => {
   };
 
   const startPlaylist = () => {
+    if (!playlistsList.length) return;
     if (isPlaying) dispatch(pauseSong());
     else {
       dispatch(
@@ -114,6 +115,7 @@ const Playlist = () => {
       {!isLikedSongs && playlist ? (
         <PlaylistContent
           playlist={playlist}
+          isPlaylistsPlayable={playlistsList.length}
           following={following}
           handleFollow={handleFollow}
           startPlaylist={startPlaylist}
@@ -123,6 +125,7 @@ const Playlist = () => {
       ) : (
         <PlaylistContent
           playlist={playlist}
+          isPlaylistsPlayable={playlistsList.length}
           startPlaylist={startPlaylist}
           isPlaying={isPlaying}
           isLikedSongs

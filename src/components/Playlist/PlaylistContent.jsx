@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   PlaylistTitle,
@@ -29,13 +29,13 @@ import { useSelector } from 'react-redux';
 
 const PlaylistContent = ({
   playlist,
+  isPlaylistsPlayable,
   isLikedSongs,
   following,
   handleFollow,
   startPlaylist,
   isPlaying,
   userId,
-  inLibrary,
 }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [moreMenuPosition, setMoreMenuPosition] = useState([0, 0]);
@@ -43,19 +43,23 @@ const PlaylistContent = ({
   const { likedSongs } = useSelector(({ playlists }) => playlists);
 
   const history = useHistory();
-  const playlistData = isLikedSongs
-    ? {
-        ...playlist,
-        ...{
-          name: 'Liked Songs',
-          images: [
-            {
-              url: 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+  const playlistData = useMemo(
+    () =>
+      isLikedSongs
+        ? {
+            ...playlist,
+            ...{
+              name: 'Liked Songs',
+              images: [
+                {
+                  url: 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+                },
+              ],
             },
-          ],
-        },
-      }
-    : { ...playlist };
+          }
+        : { ...playlist },
+    [isLikedSongs, playlist]
+  );
 
   const handleOnClickMore = e => {
     setIsMoreMenuOpen(true);
@@ -109,7 +113,7 @@ const PlaylistContent = ({
           </PlaylistHeaderSubcontainer>
 
           <PlaylistButtonsContainer>
-            <PlaylistPlay onClick={startPlaylist} disabled={!playlistData?.tracks?.total}>
+            <PlaylistPlay onClick={startPlaylist} disabled={!isPlaylistsPlayable}>
               {isPlaying ? 'PAUSE' : 'PLAY'}
             </PlaylistPlay>
             {!isLikedSongs ? (
@@ -141,26 +145,24 @@ const PlaylistContent = ({
       </PlaylistLeftWrapper>
       <PlaylistRightWrapper>
         {playlistData?.tracks?.items?.length ? (
-          playlistData?.tracks?.items
-            ?.filter(track => track?.track?.preview_url)
-            .map((track, i) => (
-              <TrackItem
-                key={i}
-                added_at={track?.added_at}
-                isInPlaylist={isMyPlaylist}
-                song={{
-                  ...track?.track,
-                  cover: playlistData.images
-                    ? playlistData.images[0].url
-                    : 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
-                }}
-                liked={likedSongs.includes(track?.track?.id)}
-                isLikedSongs={isLikedSongs}
-                playlistId={playlistData.id}
-              />
-            ))
+          playlistData?.tracks?.items.map((track, i) => (
+            <TrackItem
+              key={i}
+              added_at={track?.added_at}
+              isInPlaylist={isMyPlaylist}
+              song={{
+                ...track?.track,
+                cover: playlistData.images
+                  ? playlistData.images[0].url
+                  : 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+              }}
+              liked={likedSongs.includes(track?.track?.id)}
+              isLikedSongs={isLikedSongs}
+              playlistId={playlistData.id}
+            />
+          ))
         ) : (
-          <EmptyPlaylist playlistId={playlistData.id} />
+          <EmptyPlaylist playlistId={playlistData.id} isLikedSongs={isLikedSongs} />
         )}
       </PlaylistRightWrapper>
     </>

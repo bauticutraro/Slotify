@@ -12,13 +12,26 @@ import { ReactComponent as EmptyPlaylistIcon } from '../../assets/icons/empty-pl
 import { useSelector, useDispatch } from 'react-redux';
 import Loader from '../Loader/Loader';
 import TrackItem from '../TrackItem/TrackItem';
-import { addTrackToPlaylistStart } from '../../containers/Playlists/playlistsActions';
+import {
+  addTrackToPlaylistStart,
+  likeSongStart,
+} from '../../containers/Playlists/playlistsActions';
 
-const EmptyPlaylist = ({ playlistId }) => {
+const EmptyPlaylist = ({ playlistId, isLikedSongs }) => {
   const dispatch = useDispatch();
-  const { randomTracks, likedSongs, loading } = useSelector(
-    ({ playlists }) => playlists
-  );
+  const { randomTracks, likedSongs, loading } = useSelector(({ playlists }) => playlists);
+
+  const handleAddSongToPlaylist = track => {
+    if (!isLikedSongs) dispatch(addTrackToPlaylistStart({ playlistId, tracks: track.uri }));
+    else
+      dispatch(
+        likeSongStart({
+          songId: track.id,
+          action: !likedSongs.includes(track.id) ? 'follow' : 'unfollow',
+          isLikedSongsScreen: isLikedSongs,
+        })
+      );
+  };
 
   if (loading) return <Loader />;
 
@@ -45,10 +58,7 @@ const EmptyPlaylist = ({ playlistId }) => {
           hasOptions={false}
           btn={{
             title: 'ADD',
-            onClick: () =>
-              dispatch(
-                addTrackToPlaylistStart({ playlistId, tracks: track.uri })
-              ),
+            onClick: () => handleAddSongToPlaylist(track),
           }}
           liked={likedSongs.includes(track.id)}
         />

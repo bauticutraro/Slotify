@@ -145,10 +145,11 @@ function* checkLikeSongSaga() {
   yield takeLatest(constants.CHECK_LIKE_SONG_START, checkLikeSong);
 }
 
-function* likeSong({ payload: { songId, action } }) {
+function* likeSong({ payload: { songId, action, isLikedSongsScreen } }) {
   try {
     yield services.likeSong(songId, action);
-    yield checkLikeSong();
+    if (isLikedSongsScreen) yield getUserTracks();
+    else yield checkLikeSong();
   } catch (err) {
     yield put(actions.likeSongFailure({ error: err.message }));
   }
