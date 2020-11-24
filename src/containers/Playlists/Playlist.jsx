@@ -19,14 +19,13 @@ import Loader from '../../components/Loader/Loader';
 // hooks
 import useNotifier from '../../hooks/useNotifier';
 import useTitle from '../../hooks/useTitle';
+import useIsPlaying from '../../hooks/useIsPlaying';
 
 const Playlist = () => {
   const dispatch = useDispatch();
 
   const { playlist, following, loading, error } = useSelector(({ playlists }) => playlists),
     { id: userId } = useSelector(({ auth }) => auth.user);
-
-  const isPlaying = useSelector(({ track: { isPlaying } }) => isPlaying);
 
   const playlistsList = playlist?.tracks?.items?.filter(({ track }) => track?.preview_url);
 
@@ -39,6 +38,11 @@ const Playlist = () => {
 
   const isLikedSongs = useMemo(() => pathname.includes('/tracks'), [pathname]);
 
+  const isPlaying = useIsPlaying(isLikedSongs ? 'likedSongs' : 'playlist', isLikedSongs ? '' : id);
+  const songFrom = {
+    type: isLikedSongs ? 'likedSongs' : 'playlist',
+    id: isLikedSongs ? '' : playlist.id,
+  };
   useTitle(`Spotify - ${isLikedSongs ? 'Liked songs' : playlist.name}`);
 
   useEffect(() => {
@@ -97,6 +101,7 @@ const Playlist = () => {
             cover: playlist.images
               ? playlist.images[0].url
               : 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+            from: { ...songFrom },
           },
         })
       );
@@ -121,6 +126,7 @@ const Playlist = () => {
           startPlaylist={startPlaylist}
           isPlaying={isPlaying}
           userId={userId}
+          songFrom={songFrom}
         />
       ) : (
         <PlaylistContent
@@ -130,6 +136,7 @@ const Playlist = () => {
           isPlaying={isPlaying}
           isLikedSongs
           userId={userId}
+          songFrom={songFrom}
         />
       )}
     </PlaylistContainer>

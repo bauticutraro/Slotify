@@ -36,6 +36,7 @@ import { PlaylistContainer } from '../Playlists/playlistsStyles';
 import MoreMenu from '../../components/MoreMenu/MoreMenu';
 import { getAlbumsStart } from '../Library/libraryActions';
 import { checkLikeSongStart } from '../Playlists/playlistsActions';
+import useIsPlaying from '../../hooks/useIsPlaying';
 
 const Album = () => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
@@ -45,8 +46,9 @@ const Album = () => {
   const { album, loading } = useSelector(({ album }) => album);
   const { albums, loading: albumsLoading } = useSelector(({ library }) => library);
   const { likedSongs, loading: playlistLoading } = useSelector(({ playlists }) => playlists);
-  const isPlaying = useSelector(({ track }) => track.isPlaying);
   const { id } = useParams();
+  const isPlaying = useIsPlaying('album', id);
+  const songFrom = { type: 'album', id };
 
   const history = useHistory();
 
@@ -95,7 +97,11 @@ const Album = () => {
       );
       dispatch(
         startSong({
-          song: { ...album.tracks.items[0], cover: album.images[0].url },
+          song: {
+            ...album.tracks.items[0],
+            cover: album.images[0].url,
+            from: { ...songFrom },
+          },
         })
       );
     }
@@ -187,6 +193,8 @@ const Album = () => {
               key={i}
               song={{ ...track, cover: album.images[0].url }}
               liked={likedSongs.includes(track.id)}
+              from={songFrom}
+              isPlaylistPlaying={isPlaying}
             />
           ))}
           <PlaylistCopyrightContainer>

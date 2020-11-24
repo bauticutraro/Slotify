@@ -36,6 +36,7 @@ const PlaylistContent = ({
   startPlaylist,
   isPlaying,
   userId,
+  songFrom,
 }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [moreMenuPosition, setMoreMenuPosition] = useState([0, 0]);
@@ -159,6 +160,8 @@ const PlaylistContent = ({
               liked={likedSongs.includes(track?.track?.id)}
               isLikedSongs={isLikedSongs}
               playlistId={playlistData.id}
+              from={songFrom}
+              isPlaylistPlaying={isPlaying}
             />
           ))
         ) : (

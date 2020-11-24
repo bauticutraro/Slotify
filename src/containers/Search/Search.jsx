@@ -29,9 +29,7 @@ import TrackItem from '../../components/TrackItem/TrackItem';
 const Search = () => {
   const dispatch = useDispatch();
 
-  const { list, searchValue, loading, error } = useSelector(
-    ({ search }) => search
-  );
+  const { list, searchValue, loading, error } = useSelector(({ search }) => search);
 
   const { showSnackbar } = useNotifier({
     message: 'Oooops something went wrong.',
@@ -52,8 +50,7 @@ const Search = () => {
   };
 
   const canRender = () => {
-    if (Object.keys(list).length)
-      return list.artists.items.length || list.tracks.items.length;
+    if (Object.keys(list).length) return list.artists.items.length || list.tracks.items.length;
     return false;
   };
 
@@ -72,9 +69,7 @@ const Search = () => {
                 </SectionTitleContainer>
                 <TopResult
                   id={list?.artists?.items[0]?.id || list.tracks.items[0].id}
-                  title={
-                    list?.artists?.items[0]?.name || list.tracks.items[0].name
-                  }
+                  title={list?.artists?.items[0]?.name || list.tracks.items[0].name}
                   cover={
                     list?.artists?.items[0]?.images[0]?.url ||
                     list?.tracks.items[0]?.album?.images[0].url
@@ -93,8 +88,7 @@ const Search = () => {
                       <SectionTitleSeeAll
                         onClick={() =>
                           handleSeeAll(
-                            list?.artists?.items[0]?.id ||
-                              list.tracks.items[0].id,
+                            list?.artists?.items[0]?.id || list.tracks.items[0].id,
                             'tracks'
                           )
                         }
@@ -107,6 +101,7 @@ const Search = () => {
                     if (i < 3) {
                       return (
                         <TrackItem
+                          key={i}
                           song={{ ...track }}
                           hasImage={true}
                           hasDuration={false}
@@ -127,8 +122,7 @@ const Search = () => {
                     <SectionTitleSeeAll
                       onClick={() =>
                         handleSeeAll(
-                          list?.artists?.items[0]?.id ||
-                            list.tracks.items[0].id,
+                          list?.artists?.items[0]?.id || list.tracks.items[0].id,
                           'artists'
                         )
                       }
@@ -144,9 +138,7 @@ const Search = () => {
                             key={artist.id}
                             id={artist.id}
                             title={artist.name}
-                            cover={
-                              artist.images.length ? artist.images[0].url : null
-                            }
+                            cover={artist.images.length ? artist.images[0].url : null}
                           />
                         );
                       return null;
@@ -161,9 +153,7 @@ const Search = () => {
                   <SectionTitle>Albums</SectionTitle>
                   {list?.artists?.items.length ? (
                     <SectionTitleSeeAll
-                      onClick={() =>
-                        handleSeeAll(list?.artists?.items[0]?.id, 'albums')
-                      }
+                      onClick={() => handleSeeAll(list?.artists?.items[0]?.id, 'albums')}
                     >
                       SEE ALL
                     </SectionTitleSeeAll>

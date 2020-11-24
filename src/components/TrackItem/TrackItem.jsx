@@ -50,6 +50,8 @@ const TrackItem = ({
   liked,
   isLikedSongs = false,
   playlistId,
+  from,
+  isPlaylistPlaying,
 }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [moreMenuPosition, setMoreMenuPosition] = useState([0, 0]);
@@ -62,11 +64,10 @@ const TrackItem = ({
   let { addTrack } = modalsContext;
 
   const {
-    isPlaying,
-    song: { id: songId },
+    song: { id: songId, from: songPlayingFrom },
   } = useSelector(({ track }) => track);
 
-  const isCurrentlyPlaying = songId === id;
+  const isCurrentlyPlaying = songId === id && (isPlaylistPlaying || (!songPlayingFrom && !from));
 
   const handleOnClickMore = e => {
     setIsMoreMenuOpen(true);
@@ -77,7 +78,7 @@ const TrackItem = ({
     if (preview_url) {
       dispatch(
         startSong({
-          song,
+          song: { ...song, from },
           cover,
         })
       );
@@ -124,7 +125,7 @@ const TrackItem = ({
       />
       <ItemContainer align={align} hasPadding={hasPadding} isDisabled={!preview_url}>
         <MusicIconContainer>
-          {isPlaying && songId === id ? (
+          {isCurrentlyPlaying ? (
             <PauseIcon
               height='16'
               width='16'

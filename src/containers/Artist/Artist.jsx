@@ -40,6 +40,7 @@ import {
 import MoreMenu from '../../components/MoreMenu/MoreMenu';
 import { checkLikeSongStart } from '../Playlists/playlistsActions';
 import { pauseSong, setList, startSong } from '../Track/trackActions';
+import useIsPlaying from '../../hooks/useIsPlaying';
 
 const Artist = () => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
@@ -54,11 +55,12 @@ const Artist = () => {
     appears: albums.filter(({ album_type }) => album_type === 'compilation'),
   }));
 
-  const isPlaying = useSelector(({ track }) => track.isPlaying);
+  const { id } = useParams();
+
+  const isPlaying = useIsPlaying('artist', id);
+  const songFrom = { type: 'artist', id };
 
   useTitle(`Spotify - ${artist.name}`);
-
-  const { id } = useParams();
 
   React.useEffect(() => {
     dispatch(getArtistStart({ id }));
@@ -88,7 +90,11 @@ const Artist = () => {
       );
       dispatch(
         startSong({
-          song: { ...tracks[0], cover: artist.images && artist.images[0].url },
+          song: {
+            ...tracks[0],
+            cover: artist.images && artist.images[0].url,
+            from: { ...songFrom },
+          },
         })
       );
     }
@@ -176,6 +182,8 @@ const Artist = () => {
                             cover: artist.images && artist.images[0].url,
                           }}
                           liked={likedSongs.includes(track.id)}
+                          from={songFrom}
+                          isPlaylistPlaying={isPlaying}
                         />
                       ))}
                     </ArtistSection>
