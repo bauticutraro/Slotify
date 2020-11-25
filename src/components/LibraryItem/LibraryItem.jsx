@@ -10,7 +10,7 @@ import {
   LibraryPlaylistAuthor,
   LibraryPlaylistPlay,
   DefaultCover,
-  LibraryPlaylistTag
+  LibraryPlaylistTag,
 } from './playlistItemStyles';
 
 const LibraryItem = ({
@@ -22,9 +22,11 @@ const LibraryItem = ({
   isPlayable = true,
   type = 'playlist',
   cardType,
-  tag
+  tag,
 }) => {
   const history = useHistory();
+
+  console.log(type);
 
   const handleChangeRoute = () => {
     if (!isLikedSongs && id) {
@@ -32,7 +34,7 @@ const LibraryItem = ({
         artist: 'artist',
         playlist: 'playlist',
         album: 'album',
-        song: 'album'
+        song: 'album',
       };
       history.push(`/app/${PARAMS[type.toLowerCase()]}/${id}`);
     } else if (isLikedSongs) history.push('/app/collection/tracks');
@@ -52,9 +54,7 @@ const LibraryItem = ({
       <LibraryPlaylistTitle cardType={cardType}>{title}</LibraryPlaylistTitle>
       {subtitle && (
         <LibraryPlaylistAuthor
-          onClick={() =>
-            history.push(`/app/user/${subtitle.toLowerCase()}`, { id })
-          }
+          onClick={() => history.push(`/app/user/${subtitle.toLowerCase()}`, { id })}
         >
           {subtitle}
         </LibraryPlaylistAuthor>
@@ -76,7 +76,7 @@ LibraryItem.propTypes = {
   title: PropTypes.string.isRequired,
   subtitle: PropTypes.string,
   cover: PropTypes.string,
-  isPlayable: PropTypes.bool
+  isPlayable: PropTypes.bool,
 };
 
 export default React.memo(LibraryItem);

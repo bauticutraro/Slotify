@@ -6,7 +6,7 @@ import LibraryItem from '../../components/LibraryItem/LibraryItem';
 import {
   LibraryItemsContainer,
   SectionTitleContainer,
-  SectionTitle
+  SectionTitle,
 } from '../../components/LibraryItem/playlistItemStyles';
 import Loader from '../../components/Loader/Loader';
 import useNotifier from '../../hooks/useNotifier';
@@ -16,7 +16,7 @@ const RelatedArtists = () => {
   const { artist, loading, error } = useSelector(({ search }) => search);
 
   const { showSnackbar } = useNotifier({
-    message: 'Oooops something went wrong.'
+    message: 'Oooops something went wrong.',
   });
 
   const { name } = useParams();
@@ -41,6 +41,7 @@ const RelatedArtists = () => {
             id={artist.id}
             title={artist.name}
             subtitle='Artist'
+            type='artist'
             cover={artist.images && artist.images[0].url}
             isPlayable={false}
           />

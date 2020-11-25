@@ -1,6 +1,6 @@
 import api from '../../utils/api';
 
-export const getSearch = query => api(`/search?q=${query}&type=track%2Cartist`);
+export const getSearch = (query, type = 'track') => api(`/search?q=${query}&type=${type}%2Cartist`);
 
 export const getArtistAlbums = artistId => api(`/artists/${artistId}/albums`);
 
