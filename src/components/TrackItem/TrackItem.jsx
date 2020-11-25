@@ -50,21 +50,14 @@ const TrackItem = ({
   liked,
   isLikedSongs = false,
   playlistId,
+  from,
+  isPlaylistPlaying,
 }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [moreMenuPosition, setMoreMenuPosition] = useState([0, 0]);
 
   const dispatch = useDispatch();
-  const {
-    id,
-    name,
-    artists,
-    album,
-    duration_ms,
-    cover,
-    uri,
-    preview_url,
-  } = song;
+  const { id, name, artists, album, duration_ms, cover, uri, preview_url } = song;
 
   const modalsContext = useContext(ModalsContext);
 
@@ -72,10 +65,11 @@ const TrackItem = ({
 
   const {
     isPlaying,
-    song: { id: songId },
+    song: { id: songId, from: songPlayingFrom },
   } = useSelector(({ track }) => track);
 
-  const isCurrentlyPlaying = songId === id;
+  const isCurrentlyPlaying =
+    songId === id && (isPlaylistPlaying || (!songPlayingFrom && !from)) && isPlaying;
 
   const handleOnClickMore = e => {
     setIsMoreMenuOpen(true);
@@ -86,11 +80,21 @@ const TrackItem = ({
     if (preview_url) {
       dispatch(
         startSong({
-          song,
+          song: { ...song, from },
           cover,
         })
       );
     }
+  };
+
+  const handleLikeSong = () => {
+    dispatch(
+      likeSongStart({
+        songId: id,
+        action: !liked ? 'follow' : 'unfollow',
+        isLikedSongsScreen: isLikedSongs,
+      })
+    );
   };
 
   return (
@@ -105,17 +109,8 @@ const TrackItem = ({
             onClick: () => addTrack.setAddTrackData({ isVisible: true, uri }),
           },
           {
-            title:
-              !liked && !isLikedSongs
-                ? 'Save to songs you like'
-                : 'Remove from your songs',
-            onClick: () =>
-              dispatch(
-                likeSongStart({
-                  songId: id,
-                  action: !liked ? 'follow' : 'unfollow',
-                })
-              ),
+            title: !liked ? 'Save to songs you like' : 'Remove from your songs',
+            onClick: handleLikeSong,
           },
           isInPlaylist && {
             title: 'Remove from this playlist',
@@ -130,13 +125,9 @@ const TrackItem = ({
           },
         ]}
       />
-      <ItemContainer
-        align={align}
-        hasPadding={hasPadding}
-        isDisabled={!preview_url}
-      >
+      <ItemContainer align={align} hasPadding={hasPadding} isDisabled={!preview_url}>
         <MusicIconContainer>
-          {isPlaying && songId === id ? (
+          {isCurrentlyPlaying ? (
             <PauseIcon
               height='16'
               width='16'
@@ -172,12 +163,8 @@ const TrackItem = ({
               <ArtistsContainer>
                 {artists?.map((artist, i) => (
                   <ArtistContainer key={i}>
-                    <Artist to={`/app/artist/${artist.id}`}>
-                      {artist.name}
-                    </Artist>
-                    {i + 1 !== artists.length ? (
-                      <ArtistSeparator>,</ArtistSeparator>
-                    ) : null}
+                    <Artist to={`/app/artist/${artist.id}`}>{artist.name}</Artist>
+                    {i + 1 !== artists.length ? <ArtistSeparator>,</ArtistSeparator> : null}
                   </ArtistContainer>
                 ))}
               </ArtistsContainer>
@@ -203,16 +190,8 @@ const TrackItem = ({
         )}
 
         {hasOptions && (
-          <OptionButtonContainer
-            onClick={handleOnClickMore}
-            active={isMoreMenuOpen}
-          >
-            <MoreIcon
-              height='18'
-              width='18'
-              fill='rgba(255, 255, 255, 1)'
-              data-type='more'
-            />
+          <OptionButtonContainer onClick={handleOnClickMore} active={isMoreMenuOpen}>
+            <MoreIcon height='18' width='18' fill='rgba(255, 255, 255, 1)' data-type='more' />
           </OptionButtonContainer>
         )}
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,32 +12,22 @@ import {
   cleanPlaylist,
 } from './playlistsActions';
 import { PlaylistContainer } from './playlistsStyles';
-import {
-  setList,
-  startSong,
-  pauseSong,
-  cleanList,
-} from '../Track/trackActions';
+import { setList, startSong, pauseSong, cleanList } from '../Track/trackActions';
 
 import PlaylistContent from '../../components/Playlist/PlaylistContent';
 import Loader from '../../components/Loader/Loader';
 // hooks
 import useNotifier from '../../hooks/useNotifier';
 import useTitle from '../../hooks/useTitle';
+import useIsPlaying from '../../hooks/useIsPlaying';
 
 const Playlist = () => {
   const dispatch = useDispatch();
 
-  const { playlist, following, loading, error } = useSelector(
-      ({ playlists }) => playlists
-    ),
+  const { playlist, following, loading, error } = useSelector(({ playlists }) => playlists),
     { id: userId } = useSelector(({ auth }) => auth.user);
 
-  const isPlaying = useSelector(({ track: { isPlaying } }) => isPlaying);
-
-  const playlistsList = playlist?.tracks?.items?.filter(
-    ({ track }) => track?.preview_url
-  );
+  const playlistsList = playlist?.tracks?.items?.filter(({ track }) => track?.preview_url);
 
   const { id } = useParams(),
     { pathname } = useLocation();
@@ -46,10 +36,17 @@ const Playlist = () => {
     message: 'Oooops something went wrong.',
   });
 
-  useTitle(`Spotify - ${playlist.name}`);
+  const isLikedSongs = useMemo(() => pathname.includes('/tracks'), [pathname]);
+
+  const isPlaying = useIsPlaying(isLikedSongs ? 'likedSongs' : 'playlist', isLikedSongs ? '' : id);
+  const songFrom = {
+    type: isLikedSongs ? 'likedSongs' : 'playlist',
+    id: isLikedSongs ? '' : playlist.id,
+  };
+  useTitle(`Slotify - ${isLikedSongs ? 'Liked songs' : playlist.name}`);
 
   useEffect(() => {
-    if (!pathname.includes('/tracks')) {
+    if (!isLikedSongs) {
       dispatch(getPlaylistStart({ id }));
     } else dispatch(getUserTracksStart());
 
@@ -57,27 +54,26 @@ const Playlist = () => {
       dispatch(cleanPlaylist());
       dispatch(cleanList());
     };
-  }, [dispatch, id, pathname, userId]);
+  }, [isLikedSongs, dispatch, id, pathname, userId]);
 
   useEffect(() => {
     if (playlist?.tracks?.items.length === 0) dispatch(getRandomTracksStart());
-    dispatch(checkUserFollowPlaylistStart({ playlistId: id, userId }));
+    if (!isLikedSongs) dispatch(checkUserFollowPlaylistStart({ playlistId: id, userId }));
     dispatch(checkLikeSongStart());
-  }, [playlist, dispatch, id, userId]);
+  }, [isLikedSongs, playlist, dispatch, id, userId, pathname]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
       '--color',
-      pathname.includes('/tracks')
+      isLikedSongs
         ? '#5f54a0'
         : playlist?.tracks?.items?.length
         ? playlist.primary_color
         : '#a0c3d2'
     );
 
-    return () =>
-      document.documentElement.style.setProperty('--color', '#121212');
-  }, [pathname, playlist]);
+    return () => document.documentElement.style.setProperty('--color', '#121212');
+  }, [isLikedSongs, pathname, playlist]);
 
   const handleFollow = () => {
     dispatch(
@@ -90,13 +86,12 @@ const Playlist = () => {
   };
 
   const startPlaylist = () => {
+    if (!playlistsList.length) return;
     if (isPlaying) dispatch(pauseSong());
     else {
       dispatch(
         setList({
-          list: playlist?.tracks?.items?.filter(
-            ({ track }) => track?.preview_url
-          ),
+          list: playlist?.tracks?.items?.filter(({ track }) => track?.preview_url),
         })
       );
       dispatch(
@@ -106,11 +101,13 @@ const Playlist = () => {
             cover: playlist.images
               ? playlist.images[0].url
               : 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+            from: { ...songFrom },
           },
         })
       );
     }
   };
+
   if (loading || !Object.keys(playlist).length) {
     document.documentElement.style.setProperty('--color', '#121212');
     return <Loader isLoading={loading} />;
@@ -120,23 +117,26 @@ const Playlist = () => {
 
   return (
     <PlaylistContainer>
-      {!pathname.includes('/tracks') && playlist ? (
+      {!isLikedSongs && playlist ? (
         <PlaylistContent
           playlist={playlist}
+          isPlaylistsPlayable={playlistsList.length}
           following={following}
           handleFollow={handleFollow}
           startPlaylist={startPlaylist}
           isPlaying={isPlaying}
           userId={userId}
-          inLibrary={playlistsList.some(pl => pl.id === playlist.id)}
+          songFrom={songFrom}
         />
       ) : (
         <PlaylistContent
           playlist={playlist}
+          isPlaylistsPlayable={playlistsList.length}
           startPlaylist={startPlaylist}
           isPlaying={isPlaying}
           isLikedSongs
           userId={userId}
+          songFrom={songFrom}
         />
       )}
     </PlaylistContainer>

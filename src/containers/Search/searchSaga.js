@@ -4,9 +4,9 @@ import * as constants from './searchConstants';
 import * as actions from './searchActions';
 import * as services from './searchServices';
 
-function* getResults({ payload: { query } }) {
+function* getResults({ payload: { query, type } }) {
   try {
-    const response = yield services.getSearch(query);
+    const response = yield services.getSearch(query, type);
     if (response) yield put(actions.searchSuccess({ results: response }));
   } catch (err) {
     yield put(actions.searchFailure({ error: err.message }));
@@ -22,8 +22,7 @@ function* getResultsSaga() {
 function* getArtistAlbums({ payload: { id } }) {
   try {
     const response = yield services.getArtistAlbums(id);
-    if (response)
-      yield put(actions.getArtistAlbumsSuccess({ data: response.items }));
+    if (response) yield put(actions.getArtistAlbumsSuccess({ data: response.items }));
   } catch (err) {
     yield put(actions.getArtistAlbumsFailure({ error: err.message }));
   }
@@ -36,8 +35,7 @@ function* getArtistAlbumsSaga() {
 function* getArtistSongs({ payload: { id } }) {
   try {
     const response = yield services.getArtistSongs(id);
-    if (response)
-      yield put(actions.getArtistSongsSuccess({ data: response.tracks }));
+    if (response) yield put(actions.getArtistSongsSuccess({ data: response.tracks }));
   } catch (err) {
     yield put(actions.getArtistSongsFailure({ error: err.message }));
   }
@@ -50,8 +48,7 @@ function* getArtistSongsSaga() {
 function* getRelatedArtists({ payload: { id } }) {
   try {
     const response = yield services.getRelatedArtists(id);
-    if (response)
-      yield put(actions.getRelatedArtistsSuccess({ data: response.artists }));
+    if (response) yield put(actions.getRelatedArtistsSuccess({ data: response.artists }));
   } catch (err) {
     yield put(actions.getRelatedArtistsFailure({ error: err.message }));
   }
@@ -66,6 +63,6 @@ export default function* searchSaga() {
     fork(getResultsSaga),
     fork(getArtistAlbumsSaga),
     fork(getArtistSongsSaga),
-    fork(getRelatedArtistsSaga)
+    fork(getRelatedArtistsSaga),
   ]);
 }

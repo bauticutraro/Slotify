@@ -24,8 +24,11 @@ export const createPlaylist = (userId, name = 'New Playlist') =>
     }
   );
 
-export const addTrackToPlaylist = (playlistId, tracksUris, method = 'POST') =>
-  api(`/playlists/${playlistId}/tracks?uris=${tracksUris}`, method);
+export const addTrackToPlaylist = (playlistId, tracksUris) =>
+  api(`/playlists/${playlistId}/tracks?uris=${tracksUris}`, 'POST');
+
+export const removeTrackToPlaylist = (playlistId, tracksUris) =>
+  api(`/playlists/${playlistId}/tracks`, 'DELETE', {}, { tracks: [{ uri: tracksUris }] });
 
 export const checkUserFollowPlaylist = (playlistId, userId) =>
   api(`/playlists/${playlistId}/followers/contains?ids=${userId}`);

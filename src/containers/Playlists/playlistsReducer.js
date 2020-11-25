@@ -21,6 +21,8 @@ export default (state = initialState, { type, payload }) => {
     case constants.ADD_TRACK_TO_PLAYLIST_START:
     case constants.CHECK_LIKE_SONG_START:
       return { ...state, loading: true, error: null };
+    case constants.LIKE_SONG_START:
+      return { ...state, loading: payload.isLikedSongsScreen, error: null };
 
     case constants.GET_USER_PLAYLISTS_SUCCESS:
       return { ...state, loading: false, error: null, list: payload.playlists };
@@ -73,6 +75,7 @@ export default (state = initialState, { type, payload }) => {
     case constants.CHECK_USER_FOLLOW_PLAYLIST_FAILURE:
     case constants.FOLLOW_PLAYLIST_FAILURE:
     case constants.CHECK_LIKE_SONG_FAILURE:
+    case constants.LIKE_SONG_FAILURE:
       return { ...state, loading: false, error: payload.error };
     default:
       return state;

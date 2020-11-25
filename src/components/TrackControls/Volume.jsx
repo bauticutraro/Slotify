@@ -7,7 +7,7 @@ import {
   VolumeContainer,
   VolumeIconContainer,
   ProgressBar,
-  ProgressBarContainer
+  ProgressBarContainer,
 } from './trackControlsStyles';
 
 const Volume = React.forwardRef(({ setVolume, volume }, ref) => {
@@ -22,7 +22,7 @@ const Volume = React.forwardRef(({ setVolume, volume }, ref) => {
   };
 
   const handleMuteVolume = () => {
-    volume === '0' && lastVolume > '0.1'
+    volume === '0' && lastVolume > '0.009'
       ? handleVolume({ target: { value: lastVolume * 100 } })
       : volume === '0'
       ? handleVolume({ target: { value: 40 } })

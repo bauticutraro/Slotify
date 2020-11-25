@@ -83,7 +83,10 @@ function* createPlaylistSaga() {
 // addTrackToPlaylist
 function* addTrackToPlaylist({ payload: { playlistId, tracks, method } }) {
   try {
-    const playlist = yield services.addTrackToPlaylist(playlistId, tracks, method);
+    let playlist;
+    if (method === 'DELETE') playlist = yield services.removeTrackToPlaylist(playlistId, tracks);
+    else playlist = yield services.addTrackToPlaylist(playlistId, tracks);
+
     if (playlist) {
       yield put(actions.addTrackToPlaylistSuccess({ playlist }));
       yield put(actions.getPlaylistStart({ id: playlistId }));
@@ -145,10 +148,11 @@ function* checkLikeSongSaga() {
   yield takeLatest(constants.CHECK_LIKE_SONG_START, checkLikeSong);
 }
 
-function* likeSong({ payload: { songId, action } }) {
+function* likeSong({ payload: { songId, action, isLikedSongsScreen } }) {
   try {
     yield services.likeSong(songId, action);
-    yield checkLikeSong();
+    if (isLikedSongsScreen) yield getUserTracks();
+    else yield checkLikeSong();
   } catch (err) {
     yield put(actions.likeSongFailure({ error: err.message }));
   }

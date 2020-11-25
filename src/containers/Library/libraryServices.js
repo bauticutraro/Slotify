@@ -1,5 +1,5 @@
 import api from '../../utils/api';
 
-export const getTopArtists = () => api('/me/top/artists?limit=10');
+export const getFollowedArtist = () => api('/me/following?type=artist');
 
 export const getAlbums = () => api('/me/albums?limit=10');

@@ -36,6 +36,7 @@ import { PlaylistContainer } from '../Playlists/playlistsStyles';
 import MoreMenu from '../../components/MoreMenu/MoreMenu';
 import { getAlbumsStart } from '../Library/libraryActions';
 import { checkLikeSongStart } from '../Playlists/playlistsActions';
+import useIsPlaying from '../../hooks/useIsPlaying';
 
 const Album = () => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
@@ -45,12 +46,19 @@ const Album = () => {
   const { album, loading } = useSelector(({ album }) => album);
   const { albums, loading: albumsLoading } = useSelector(({ library }) => library);
   const { likedSongs, loading: playlistLoading } = useSelector(({ playlists }) => playlists);
-  const isPlaying = useSelector(({ track }) => track.isPlaying);
   const { id } = useParams();
+  const isPlaying = useIsPlaying('album', id);
+  const songFrom = { type: 'album', id };
 
   const history = useHistory();
 
-  useTitle(`Spotify - ${album.name}`);
+  const [isLikeTheAlbum, setIsLikeTheAlbum] = useState(
+    albums.some(({ album: { id } }) => id === album.id)
+  );
+
+  const albumList = album?.tracks?.items?.filter(track => track?.preview_url);
+
+  useTitle(`Slotify - ${album.name}`);
 
   const randomColors = [
     '#1db954',
@@ -82,6 +90,7 @@ const Album = () => {
   }, [album, randomColors]);
 
   const startAlbum = () => {
+    if (!albumList.length) return;
     if (isPlaying) dispatch(pauseSong());
     else {
       dispatch(
@@ -91,7 +100,11 @@ const Album = () => {
       );
       dispatch(
         startSong({
-          song: { ...album.tracks.items[0], cover: album.images[0].url },
+          song: {
+            ...albumList[0],
+            cover: album.images[0].url,
+            from: { ...songFrom },
+          },
         })
       );
     }
@@ -102,10 +115,13 @@ const Album = () => {
     setMoreMenuPosition([e.pageX, e.pageY]);
   };
 
-  const iLikeTheAlbum = React.useMemo(() => albums.some(({ album: { id } }) => id === album.id), [
-    album.id,
-    albums,
-  ]);
+  const handleOnClickHeart = () => {
+    isLikeTheAlbum
+      ? dispatch(removeAlbumStart({ id: album.id }))
+      : dispatch(saveAlbumStart({ id: album.id }));
+
+    setIsLikeTheAlbum(!isLikeTheAlbum);
+  };
 
   if (loading || albumsLoading || playlistLoading) return <Loader isLoading={loading} />;
 
@@ -117,11 +133,8 @@ const Album = () => {
         moreMenuPosition={moreMenuPosition}
         items={[
           {
-            title: `${iLikeTheAlbum ? 'Remove' : 'Save'} in the library`,
-            onClick: () =>
-              iLikeTheAlbum
-                ? dispatch(removeAlbumStart({ id: album.id }))
-                : dispatch(saveAlbumStart({ id: album.id })),
+            title: `${isLikeTheAlbum ? 'Remove' : 'Save'} in the library`,
+            onClick: handleOnClickHeart,
           },
 
           {
@@ -150,22 +163,19 @@ const Album = () => {
             </PlaylistHeaderSubcontainer>
 
             <PlaylistButtonsContainer>
-              <PlaylistPlay onClick={startAlbum}>{isPlaying ? 'PAUSE' : 'PLAY'}</PlaylistPlay>
+              <PlaylistPlay onClick={startAlbum} disabled={!albumList.length}>
+                {isPlaying ? 'PAUSE' : 'PLAY'}
+              </PlaylistPlay>
               <PlaylistIconsWrapper>
                 <IconContainer>
-                  {iLikeTheAlbum ? (
-                    <HeartIcon
-                      fill='#1db954'
-                      width={20}
-                      height={20}
-                      onClick={() => dispatch(removeAlbumStart({ id: album.id }))}
-                    />
+                  {isLikeTheAlbum ? (
+                    <HeartIcon fill='#1db954' width={20} height={20} onClick={handleOnClickHeart} />
                   ) : (
                     <HeartOutlineIcon
                       fill='#fff'
                       width={20}
                       height={20}
-                      onClick={() => dispatch(saveAlbumStart({ id: album.id }))}
+                      onClick={handleOnClickHeart}
                     />
                   )}
                 </IconContainer>
@@ -188,6 +198,8 @@ const Album = () => {
               key={i}
               song={{ ...track, cover: album.images[0].url }}
               liked={likedSongs.includes(track.id)}
+              from={songFrom}
+              isPlaylistPlaying={isPlaying}
             />
           ))}
           <PlaylistCopyrightContainer>

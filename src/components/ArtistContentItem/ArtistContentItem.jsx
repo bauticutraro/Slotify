@@ -4,7 +4,7 @@ import {
   ImageContainer,
   Image,
   Title,
-  PlayIconContainer
+  PlayIconContainer,
 } from './artistContentItemStyles';
 
 import { ReactComponent as PlayIcon } from '../../assets/icons/play.svg';
@@ -21,13 +21,7 @@ const ArtistContentItem = ({ albums }) => {
     <ItemContainer key={i} onClick={() => handleChangeRoute(album.id)}>
       <ImageContainer>
         <Image src={album.images[0].url} />
-        <PlayIconContainer
-          data-value='play'
-          onClick={e => {
-            e.stopPropagation();
-            alert('play');
-          }}
-        >
+        <PlayIconContainer data-value='play'>
           <PlayIcon width='40' fill='#fff' />
         </PlayIconContainer>
       </ImageContainer>

@@ -21,6 +21,7 @@ import Artist from '../Artist/Artist';
 import Album from '../Album/Album';
 import Track from '../Track/Track';
 import ModalsContextContainer from '../../components/ModalsContext/ModalsContextContainer';
+import NotFound from '../../components/NotFound/NotFound';
 
 function AppRoute({ component: Component, ...rest }) {
   return <Route {...rest} render={props => <Component {...props} />} />;
@@ -38,10 +39,7 @@ export default () => (
             opacity = opacity > 1 ? 1 : opacity;
 
             document.documentElement.style.setProperty('--opacity', opacity);
-            document.documentElement.style.setProperty(
-              '--scroll-top',
-              e.target.scrollTop
-            );
+            document.documentElement.style.setProperty('--scroll-top', e.target.scrollTop);
           }}
         >
           <Navbar />
@@ -54,42 +52,18 @@ export default () => (
 
             <Route path='/app/album/:id' component={Album} exact />
 
-            <Route
-              path='/app/search/:name/albums'
-              component={ArtistAlbums}
-              exact
-            />
-            <Route
-              path='/app/search/:name/tracks'
-              component={ArtistSongs}
-              exact
-            />
-            <Route
-              path='/app/search/:name/artists'
-              component={RelatedArtists}
-              exact
-            />
+            <Route path='/app/search/:name/albums' component={ArtistAlbums} exact />
+            <Route path='/app/search/:name/tracks' component={ArtistSongs} exact />
+            <Route path='/app/search/:name/artists' component={RelatedArtists} exact />
             <Route path='/app/playlist/:id' component={Playlist} exact />
 
-            <Route
-              path='/app/collection/playlists'
-              exact
-              component={LibraryPlaylists}
-            />
+            <Route path='/app/collection/playlists' exact component={LibraryPlaylists} />
             <Route path='/app/collection/albums' exact component={Albums} />
             <Route path='/app/collection/artists' exact component={Artists} />
             <Route path='/app/collection/tracks' component={Playlist} />
-            <Route
-              path='/collection/playlists'
-              component={LibraryPlaylists}
-              exact
-            />
+
             <Route path='/app/download' component={Download} exact />
-            <Route
-              path='*'
-              component={() => <h1 style={{ color: 'red' }}>not found</h1>}
-              exact
-            />
+            <Route path='*' component={NotFound} exact />
           </Switch>
         </SectionContainer>
         <Track />

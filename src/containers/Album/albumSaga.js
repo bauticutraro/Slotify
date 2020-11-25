@@ -4,8 +4,6 @@ import * as constants from './albumConstants';
 import * as actions from './albumActions';
 import * as services from './albumServices';
 
-import { getAlbumsStart } from '../Library/libraryActions';
-
 function* getAlbum({ payload: { id } }) {
   try {
     const album = yield services.getAlbum(id);
@@ -23,7 +21,6 @@ function* getAlbumSaga() {
 function* saveAlbum({ payload: { id } }) {
   try {
     yield services.saveAlbum(id);
-    yield put(getAlbumsStart());
   } catch (err) {
     yield put(actions.saveAlbumFailure({ error: err.message }));
   }
@@ -36,7 +33,6 @@ function* saveAlbumSaga() {
 function* removeAlbum({ payload: { id } }) {
   try {
     yield services.removeAlbum(id);
-    yield put(getAlbumsStart());
   } catch (err) {
     yield put(actions.removeAlbumFailure({ error: err.message }));
   }

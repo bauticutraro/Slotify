@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   PlaylistTitle,
@@ -29,13 +29,14 @@ import { useSelector } from 'react-redux';
 
 const PlaylistContent = ({
   playlist,
+  isPlaylistsPlayable,
   isLikedSongs,
   following,
   handleFollow,
   startPlaylist,
   isPlaying,
   userId,
-  inLibrary,
+  songFrom,
 }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [moreMenuPosition, setMoreMenuPosition] = useState([0, 0]);
@@ -43,20 +44,23 @@ const PlaylistContent = ({
   const { likedSongs } = useSelector(({ playlists }) => playlists);
 
   const history = useHistory();
-  const playlistData = isLikedSongs
-    ? {
-        ...playlist,
-        ...{
-          name: 'Liked Songs',
-          images: [
-            {
-              url:
-                'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+  const playlistData = useMemo(
+    () =>
+      isLikedSongs
+        ? {
+            ...playlist,
+            ...{
+              name: 'Liked Songs',
+              images: [
+                {
+                  url: 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+                },
+              ],
             },
-          ],
-        },
-      }
-    : { ...playlist };
+          }
+        : { ...playlist },
+    [isLikedSongs, playlist]
+  );
 
   const handleOnClickMore = e => {
     setIsMoreMenuOpen(true);
@@ -73,7 +77,7 @@ const PlaylistContent = ({
         moreMenuPosition={moreMenuPosition}
         items={[
           {
-            title: `${inLibrary ? 'Remove' : 'Add'} from your library`,
+            title: `${following ? 'Remove' : 'Add'} from your library`,
             onClick: () => handleFollow(),
           },
           {
@@ -88,9 +92,7 @@ const PlaylistContent = ({
               {playlistData.images &&
                 (playlistData?.images[0]?.url ? (
                   <PlaylistImage
-                    src={
-                      playlistData?.images ? playlistData?.images[0]?.url : ''
-                    }
+                    src={playlistData?.images ? playlistData?.images[0]?.url : ''}
                     alt=''
                   />
                 ) : (
@@ -101,12 +103,9 @@ const PlaylistContent = ({
             {!isLikedSongs ? (
               <PlaylistOwner
                 onClick={() =>
-                  history.push(
-                    `/app/user/${playlistData?.owner.display_name}`,
-                    {
-                      id: playlistData?.owner.id,
-                    }
-                  )
+                  history.push(`/app/user/${playlistData?.owner.display_name}`, {
+                    id: playlistData?.owner.id,
+                  })
                 }
               >
                 {playlistData?.owner?.display_name}
@@ -115,10 +114,7 @@ const PlaylistContent = ({
           </PlaylistHeaderSubcontainer>
 
           <PlaylistButtonsContainer>
-            <PlaylistPlay
-              onClick={startPlaylist}
-              disabled={!playlistData?.tracks?.total}
-            >
+            <PlaylistPlay onClick={startPlaylist} disabled={!isPlaylistsPlayable}>
               {isPlaying ? 'PAUSE' : 'PLAY'}
             </PlaylistPlay>
             {!isLikedSongs ? (
@@ -126,26 +122,13 @@ const PlaylistContent = ({
                 {!isMyPlaylist ? (
                   <IconContainer>
                     {following ? (
-                      <HeartIcon
-                        fill='#1db954'
-                        width={20}
-                        height={20}
-                        onClick={handleFollow}
-                      />
+                      <HeartIcon fill='#1db954' width={20} height={20} onClick={handleFollow} />
                     ) : (
-                      <HeartOutlineIcon
-                        fill='#fff'
-                        width={20}
-                        height={20}
-                        onClick={handleFollow}
-                      />
+                      <HeartOutlineIcon fill='#fff' width={20} height={20} onClick={handleFollow} />
                     )}
                   </IconContainer>
                 ) : null}
-                <IconContainer
-                  onClick={handleOnClickMore}
-                  active={isMoreMenuOpen}
-                >
+                <IconContainer onClick={handleOnClickMore} active={isMoreMenuOpen}>
                   <MoreIcon fill='#fff' width={20} />
                 </IconContainer>
               </PlaylistIconsWrapper>
@@ -153,39 +136,36 @@ const PlaylistContent = ({
           </PlaylistButtonsContainer>
           <PlaylistDescriptionContainer>
             {!isLikedSongs ? (
-              <PlaylistDescription>
-                {playlistData?.description}
-              </PlaylistDescription>
+              <PlaylistDescription>{playlistData?.description}</PlaylistDescription>
             ) : null}
             <PlaylistTotalSongs>
-              {playlistData?.tracks?.total ? playlistData?.tracks?.total : 0}{' '}
-              songs
+              {playlistData?.tracks?.total ? playlistData?.tracks?.total : 0} songs
             </PlaylistTotalSongs>
           </PlaylistDescriptionContainer>
         </PlaylistHeader>
       </PlaylistLeftWrapper>
       <PlaylistRightWrapper>
         {playlistData?.tracks?.items?.length ? (
-          playlistData?.tracks?.items
-            ?.filter(track => track?.track?.preview_url)
-            .map((track, i) => (
-              <TrackItem
-                key={i}
-                added_at={track?.added_at}
-                isInPlaylist={isMyPlaylist}
-                song={{
-                  ...track?.track,
-                  cover: playlistData.images
-                    ? playlistData.images[0].url
-                    : 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
-                }}
-                liked={likedSongs.includes(track?.track?.id)}
-                isLikedSongs={isLikedSongs}
-                playlistId={playlistData.id}
-              />
-            ))
+          playlistData?.tracks?.items.map((track, i) => (
+            <TrackItem
+              key={i}
+              added_at={track?.added_at}
+              isInPlaylist={isMyPlaylist}
+              song={{
+                ...track?.track,
+                cover: playlistData.images
+                  ? playlistData.images[0].url
+                  : 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+              }}
+              liked={likedSongs.includes(track?.track?.id)}
+              isLikedSongs={isLikedSongs}
+              playlistId={playlistData.id}
+              from={songFrom}
+              isPlaylistPlaying={isPlaying}
+            />
+          ))
         ) : (
-          <EmptyPlaylist playlistId={playlistData.id} />
+          <EmptyPlaylist playlistId={playlistData.id} isLikedSongs={isLikedSongs} />
         )}
       </PlaylistRightWrapper>
     </>

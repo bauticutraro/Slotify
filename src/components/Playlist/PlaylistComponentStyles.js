@@ -91,13 +91,15 @@ export const PlaylistPlay = styled.button`
   ${({ disabled }) =>
     disabled
       ? css`
-          pointer-events: none;
           opacity: 0.35;
+          cursor: not-allowed;
         `
-      : null} :hover {
-    transform: scale(1.06);
-    background-color: #1ed760;
-  }
+      : css`
+          :hover {
+            transform: scale(1.06);
+            background-color: #1ed760;
+          }
+        `};
 `;
 export const PlaylistIconsWrapper = styled.div`
   display: flex;
