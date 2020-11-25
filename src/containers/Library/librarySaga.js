@@ -4,18 +4,17 @@ import * as constants from './libraryConstants';
 import * as actions from './libraryActions';
 import * as services from './libraryServices';
 
-function* getTopArtists() {
+function* getFollowedArtists() {
   try {
-    const artists = yield services.getTopArtists();
-    if (artists)
-      yield put(actions.getTopArtistsSuccess({ artists: artists.items }));
+    const { artists } = yield services.getFollowedArtist();
+    if (artists) yield put(actions.getFollowedArtistsSuccess({ artists: artists.items }));
   } catch (err) {
-    yield put(actions.getTopArtistsFailure({ error: err.message }));
+    yield put(actions.getFollowedArtistsFailure({ error: err.message }));
   }
 }
 
-function* getTopArtistsSaga() {
-  yield takeLatest(constants.GET_TOP_ARTISTS_START, getTopArtists);
+function* getFollowedArtistsSaga() {
+  yield takeLatest(constants.GET_FOLLOWED_ARTISTS_START, getFollowedArtists);
 }
 
 // Albums
@@ -33,5 +32,5 @@ function* getAlbumsSaga() {
 }
 
 export default function* librarySaga() {
-  yield all([fork(getTopArtistsSaga), fork(getAlbumsSaga)]);
+  yield all([fork(getFollowedArtistsSaga), fork(getAlbumsSaga)]);
 }

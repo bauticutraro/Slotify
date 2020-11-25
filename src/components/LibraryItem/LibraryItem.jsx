@@ -26,8 +26,6 @@ const LibraryItem = ({
 }) => {
   const history = useHistory();
 
-  console.log(type);
-
   const handleChangeRoute = () => {
     if (!isLikedSongs && id) {
       const PARAMS = {

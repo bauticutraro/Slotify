@@ -13,7 +13,7 @@ import { SearchSongsContainer } from './searchStyles';
 
 const Artist = () => {
   const dispatch = useDispatch();
-  const { artist, loading, error, list } = useSelector(({ search }) => search);
+  const { loading, error, list } = useSelector(({ search }) => search);
 
   const { showSnackbar } = useNotifier({
     message: 'Oooops something went wrong.',
@@ -27,8 +27,6 @@ const Artist = () => {
 
   if (loading) return <Loader isLoading={loading} />;
   if (!loading && error) showSnackbar();
-
-  console.log(artist);
 
   return (
     <>

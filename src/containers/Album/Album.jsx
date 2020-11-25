@@ -56,6 +56,8 @@ const Album = () => {
     albums.some(({ album: { id } }) => id === album.id)
   );
 
+  const albumList = album?.tracks?.items?.filter(track => track?.preview_url);
+
   useTitle(`Spotify - ${album.name}`);
 
   const randomColors = [
@@ -88,6 +90,7 @@ const Album = () => {
   }, [album, randomColors]);
 
   const startAlbum = () => {
+    if (!albumList.length) return;
     if (isPlaying) dispatch(pauseSong());
     else {
       dispatch(
@@ -98,7 +101,7 @@ const Album = () => {
       dispatch(
         startSong({
           song: {
-            ...album.tracks.items[0],
+            ...albumList[0],
             cover: album.images[0].url,
             from: { ...songFrom },
           },
@@ -160,7 +163,9 @@ const Album = () => {
             </PlaylistHeaderSubcontainer>
 
             <PlaylistButtonsContainer>
-              <PlaylistPlay onClick={startAlbum}>{isPlaying ? 'PAUSE' : 'PLAY'}</PlaylistPlay>
+              <PlaylistPlay onClick={startAlbum} disabled={!albumList.length}>
+                {isPlaying ? 'PAUSE' : 'PLAY'}
+              </PlaylistPlay>
               <PlaylistIconsWrapper>
                 <IconContainer>
                   {isLikeTheAlbum ? (

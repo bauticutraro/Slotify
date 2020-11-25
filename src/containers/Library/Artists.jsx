@@ -3,12 +3,12 @@ import React from 'react';
 import LibraryItem from '../../components/LibraryItem/LibraryItem';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
-import { getTopArtistsStart } from './libraryActions';
+import { getFollowedArtistsStart } from './libraryActions';
 import Loader from '../../components/Loader/Loader';
 import {
   SectionTitleContainer,
   SectionTitle,
-  LibraryItemsContainer
+  LibraryItemsContainer,
 } from '../../components/LibraryItem/playlistItemStyles';
 import useTitle from '../../hooks/useTitle';
 
@@ -19,7 +19,7 @@ const Artists = () => {
   const { artists, loading } = useSelector(({ library }) => library);
 
   React.useEffect(() => {
-    dispatch(getTopArtistsStart());
+    dispatch(getFollowedArtistsStart());
   }, [dispatch]);
 
   if (loading) return <Loader isLoading={loading} />;

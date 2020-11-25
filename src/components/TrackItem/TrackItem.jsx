@@ -64,10 +64,12 @@ const TrackItem = ({
   let { addTrack } = modalsContext;
 
   const {
+    isPlaying,
     song: { id: songId, from: songPlayingFrom },
   } = useSelector(({ track }) => track);
 
-  const isCurrentlyPlaying = songId === id && (isPlaylistPlaying || (!songPlayingFrom && !from));
+  const isCurrentlyPlaying =
+    songId === id && (isPlaylistPlaying || (!songPlayingFrom && !from)) && isPlaying;
 
   const handleOnClickMore = e => {
     setIsMoreMenuOpen(true);

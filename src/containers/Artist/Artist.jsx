@@ -60,6 +60,8 @@ const Artist = () => {
   const isPlaying = useIsPlaying('artist', id);
   const songFrom = { type: 'artist', id };
 
+  const artistPlayablesSongs = tracks.filter(track => track?.preview_url);
+
   useTitle(`Spotify - ${artist.name}`);
 
   React.useEffect(() => {
@@ -85,13 +87,13 @@ const Artist = () => {
     else {
       dispatch(
         setList({
-          list: tracks.filter(track => track?.track?.preview_url),
+          list: artistPlayablesSongs,
         })
       );
       dispatch(
         startSong({
           song: {
-            ...tracks[0],
+            ...artistPlayablesSongs[0],
             cover: artist.images && artist.images[0].url,
             from: { ...songFrom },
           },
@@ -133,7 +135,7 @@ const Artist = () => {
           <ArtistHeader>
             <ArtistName>{artist.name}</ArtistName>
             <ArtistButtonsContainer>
-              <ArtistPlayButton onClick={handleStartPlay}>
+              <ArtistPlayButton onClick={handleStartPlay} disabled={!artistPlayablesSongs.length}>
                 {isPlaying ? 'Pause' : 'Play'}
               </ArtistPlayButton>
               <ArtistFollowContainer onClick={handleFollow}>
