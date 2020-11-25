@@ -14,7 +14,7 @@ import useTitle from '../../hooks/useTitle';
 
 const Artists = () => {
   const dispatch = useDispatch();
-  useTitle('Spotify - Your Library');
+  useTitle('Slotify - Your Library');
 
   const { artists, loading } = useSelector(({ library }) => library);
 

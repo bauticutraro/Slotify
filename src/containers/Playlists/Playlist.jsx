@@ -43,7 +43,7 @@ const Playlist = () => {
     type: isLikedSongs ? 'likedSongs' : 'playlist',
     id: isLikedSongs ? '' : playlist.id,
   };
-  useTitle(`Spotify - ${isLikedSongs ? 'Liked songs' : playlist.name}`);
+  useTitle(`Slotify - ${isLikedSongs ? 'Liked songs' : playlist.name}`);
 
   useEffect(() => {
     if (!isLikedSongs) {

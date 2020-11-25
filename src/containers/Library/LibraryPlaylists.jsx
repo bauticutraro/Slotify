@@ -7,7 +7,7 @@ import { LibraryItemsContainer } from '../../components/LibraryItem/playlistItem
 import useTitle from '../../hooks/useTitle';
 
 const LibraryPlaylists = () => {
-  useTitle('Spotify - Your Library');
+  useTitle('Slotify - Your Library');
 
   const playlists = useSelector(({ playlists }) => playlists.list);
   return (

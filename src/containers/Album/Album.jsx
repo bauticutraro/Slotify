@@ -58,7 +58,7 @@ const Album = () => {
 
   const albumList = album?.tracks?.items?.filter(track => track?.preview_url);
 
-  useTitle(`Spotify - ${album.name}`);
+  useTitle(`Slotify - ${album.name}`);
 
   const randomColors = [
     '#1db954',

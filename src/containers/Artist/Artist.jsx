@@ -62,7 +62,7 @@ const Artist = () => {
 
   const artistPlayablesSongs = tracks.filter(track => track?.preview_url);
 
-  useTitle(`Spotify - ${artist.name}`);
+  useTitle(`Slotify - ${artist.name}`);
 
   React.useEffect(() => {
     dispatch(getArtistStart({ id }));

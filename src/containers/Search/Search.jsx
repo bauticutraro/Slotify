@@ -35,7 +35,7 @@ const Search = () => {
     message: 'Oooops something went wrong.',
   });
 
-  useTitle('Spotify - Search');
+  useTitle('Slotify - Search');
 
   const history = useHistory();
 

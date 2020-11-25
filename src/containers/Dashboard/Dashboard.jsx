@@ -8,12 +8,12 @@ import {
   getRecentlyPlayedStart,
   getRecommendationsStart,
   getNewReleasesStart,
-  getFeaturedPlaylistsStart
+  getFeaturedPlaylistsStart,
 } from './dashboardActions';
 import {
   LibraryItemsContainer,
   SectionTitleContainer,
-  SectionTitle
+  SectionTitle,
 } from '../../components/LibraryItem/playlistItemStyles';
 import Loader from '../../components/Loader/Loader';
 import useTitle from '../../hooks/useTitle';
@@ -23,19 +23,14 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const { showSnackbar } = useNotifier({
-    message: 'Oooops something went wrong.'
+    message: 'Oooops something went wrong.',
   });
 
-  useTitle('Spotify - Clone');
+  useTitle('Slotify | Spotify Clone');
 
-  const {
-      played,
-      recommendations,
-      featured,
-      releases,
-      loading,
-      error
-    } = useSelector(({ dashboard }) => dashboard),
+  const { played, recommendations, featured, releases, loading, error } = useSelector(
+      ({ dashboard }) => dashboard
+    ),
     authLoading = useSelector(({ auth }) => auth.loading),
     playlistLoading = useSelector(({ playlists }) => playlists.loading);
 
