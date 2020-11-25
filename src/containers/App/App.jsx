@@ -21,6 +21,7 @@ import Artist from '../Artist/Artist';
 import Album from '../Album/Album';
 import Track from '../Track/Track';
 import ModalsContextContainer from '../../components/ModalsContext/ModalsContextContainer';
+import NotFound from '../../components/NotFound/NotFound';
 
 function AppRoute({ component: Component, ...rest }) {
   return <Route {...rest} render={props => <Component {...props} />} />;
@@ -62,7 +63,7 @@ export default () => (
             <Route path='/app/collection/tracks' component={Playlist} />
 
             <Route path='/app/download' component={Download} exact />
-            <Route path='*' component={() => <h1 style={{ color: 'red' }}>not found</h1>} exact />
+            <Route path='*' component={NotFound} exact />
           </Switch>
         </SectionContainer>
         <Track />

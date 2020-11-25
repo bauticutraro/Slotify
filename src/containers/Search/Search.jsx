@@ -102,7 +102,7 @@ const Search = () => {
                       return (
                         <TrackItem
                           key={i}
-                          song={{ ...track }}
+                          song={{ ...track, cover: track?.album?.images[0]?.url }}
                           hasImage={true}
                           hasDuration={false}
                           hasAlbum={false}
